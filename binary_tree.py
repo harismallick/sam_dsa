@@ -32,6 +32,67 @@ class BinarySearchTree:
         else:
             previous_node.right = BinaryTreeNode(value)
 
+    def lookup_iter(self, value: int) -> bool:
+        if self.root is None:
+            return False
+
+        current_node = self.root
+        while current_node is not None:
+            if value < current_node.value:
+                current_node = current_node.left
+
+            elif value > current_node.value:
+                current_node = current_node.right
+            
+            elif value == current_node.value:
+                return True
+
+        return False
+
+    def dfs_pre(self) -> list[int]:
+        items: list[int] = []
+        
+        def dfs_pre_helper(self, node: BinaryTreeNode, items: list):
+            items.append(node.value)
+
+            if node.left is not None:
+                dfs_pre_helper(self, node.left, items)
+
+            if node.right is not None:
+                dfs_pre_helper(self, node.right, items)
+
+        dfs_pre_helper(self, self.root, items)
+        return items
+                
+    def dfs_post(self) -> list[int]:
+        items: list[int] = []
+        
+        def dfs_pre_helper(self, node: BinaryTreeNode, items: list):
+            if node.left is not None:
+                dfs_pre_helper(self, node.left, items)
+            
+            if node.right is not None:
+                dfs_pre_helper(self, node.right, items)
+            
+            items.append(node.value)
+
+        dfs_pre_helper(self, self.root, items)
+        return items
+
+    def dfs_in(self) -> list[int]:
+        items: list[int] = []
+        
+        def dfs_pre_helper(self, node: BinaryTreeNode, items: list):
+            if node.left is not None:
+                dfs_pre_helper(self, node.left, items)
+
+            items.append(node.value)
+
+            if node.right is not None:
+                dfs_pre_helper(self, node.right, items)
+
+        dfs_pre_helper(self, self.root, items)
+        return items
     def print_tree(self) -> None:
         print_queue: list[BinaryTreeNode | None] = [self.root]
         exponent: int = 0
@@ -71,7 +132,7 @@ def main():
     for num in eg_list:
         test_tree.insert_iter(num)
 
-    test_tree.print_tree()    
+    # test_tree.print_tree()    
 
     return
 
