@@ -33,21 +33,34 @@ class BinarySearchTree:
             previous_node.right = BinaryTreeNode(value)
 
     def lookup_iter(self, value: int) -> bool:
+        _, current = self.lookup_node(value)
+        if current is not None:
+            return True
+        return False
+
+    def lookup_node(self, value: int) -> tuple[BinaryTreeNode | None, BinaryTreeNode | None]:
         if self.root is None:
-            return False
+            return None, None
 
         current_node = self.root
+        previous_node = None
         while current_node is not None:
             if value < current_node.value:
+                previous_node = current_node
                 current_node = current_node.left
 
             elif value > current_node.value:
+                previous_node = current_node
                 current_node = current_node.right
             
             elif value == current_node.value:
-                return True
+                return (previous_node, current_node)            
 
-        return False
+        return None, None
+    
+    def delete(self, value: int) -> None:
+
+        return
 
     def dfs_pre(self) -> list[int]:
         items: list[int] = []
@@ -93,6 +106,7 @@ class BinarySearchTree:
 
         dfs_pre_helper(self, self.root, items)
         return items
+
     def print_tree(self) -> None:
         print_queue: list[BinaryTreeNode | None] = [self.root]
         exponent: int = 0

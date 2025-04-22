@@ -56,5 +56,44 @@ class TestBinaryTree(unittest.TestCase):
 
         self.assertEqual(self.bst.dfs_post(), [2,1,3,5,6,7,4,8])
 
+    def test_lookup_node_root(self):
+        self.populate_tree()
+
+        previous, current = self.bst.lookup_node(8)
+
+        self.assertEqual(previous, None)
+        self.assertEqual(current.value, 8)
+
+    def test_lookup_node_nonroot(self):
+        self.populate_tree()
+
+        previous, current = self.bst.lookup_node(3)
+
+        self.assertEqual(previous.value, 4)
+        self.assertEqual(current.value, 3)
+
+    def test_lookup_node_leaf(self):
+        self.populate_tree()
+
+        previous, current = self.bst.lookup_node(5)
+
+        self.assertEqual(previous.value, 6)
+        self.assertEqual(current.value, 5)
+
+    def test_lookup_node_emptytree(self):
+
+        previous, current = self.bst.lookup_node(8)
+
+        self.assertEqual(previous, None)
+        self.assertEqual(current, None)
+
+    def test_lookup_node_nonempty_fail(self):
+        self.populate_tree()
+
+        previous, current = self.bst.lookup_node(11)
+
+        self.assertEqual(previous, None)
+        self.assertEqual(current, None)
+
 if __name__ == "__main__":
     unittest.main() 
