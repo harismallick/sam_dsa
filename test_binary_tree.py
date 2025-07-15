@@ -1,5 +1,6 @@
 import unittest
-from binary_tree import BinarySearchTree
+from BinaryTree import BinarySearchTree 
+from BinaryTreeNode import BinaryTreeNode
 
 class TestBinaryTree(unittest.TestCase):
     def setUp(self):
@@ -9,6 +10,27 @@ class TestBinaryTree(unittest.TestCase):
         values: list[int] = [8, 4, 7, 3, 6, 5, 1, 2]
         for num in values:
             self.bst.insert_iter(num)
+    
+    def validate_tree(self) -> bool:
+        if self.bst.total_nodes == 0 or self.bst.total_nodes == 1:
+            return True
+        
+        def traverse_and_validate_tree(bst_node: BinaryTreeNode):
+            if bst_node is None:
+                return True
+            
+            if bst_node.left is not None and bst_node.left.value > bst_node.value:
+                return False
+            
+            if bst_node.right is not None and bst_node.right.value <= bst_node.value:
+                return False
+
+            left_validation: bool = traverse_and_validate_tree(bst_node.left)
+            right_validation: bool = traverse_and_validate_tree(bst_node.right)
+
+            return left_validation and right_validation
+
+        return traverse_and_validate_tree(self.bst.root)
 
     
     def test_insert_iter_empty_tree(self):
@@ -23,10 +45,12 @@ class TestBinaryTree(unittest.TestCase):
         self.bst.insert_iter(11)        
         self.assertEqual(self.bst.root.right.value, 11)
         self.assertEqual(self.bst.total_nodes, 9)
+        self.assertTrue(self.validate_tree())
 
         self.bst.insert_iter(0)
         self.assertEqual(self.bst.root.left.left.left.left.value, 0)
         self.assertEqual(self.bst.total_nodes, 10)
+        self.assertTrue(self.validate_tree())
 
     def test_lookup_iter_empty_tree(self):
         self.assertEqual(self.bst.lookup_iter(5), False)
@@ -94,6 +118,42 @@ class TestBinaryTree(unittest.TestCase):
 
         self.assertEqual(previous, None)
         self.assertEqual(current, None)
+
+    def test_delete_node_w_no_child_from_populated_tree(self):
+        self.populate_tree()
+
+        self.bst.delete(5)
+        self.assertEqual(self.bst.root.left.right.left.left, None)
+        self.assertTrue(self.validate_tree())
+
+    def test_delete_node_w_one_left_child_from_populated_tree(self):
+        self.populate_tree()
+
+        self.bst.delete(6)
+        self.assertEqual(self.bst.root.left.right.left.value, 5)
+        self.assertTrue(self.validate_tree())
+
+    def test_delete_node_w_one_right_child_from_populated_tree(self):
+        self.populate_tree()
+
+        self.bst.delete(1)
+        self.assertEqual(self.bst.root.left.left.left.value, 2)
+        self.assertTrue(self.validate_tree())
+    
+    def test_delete_node_w_two_children_from_populated_tree(self):
+        self.populate_tree()
+
+        self.bst.delete(4)
+        self.assertEqual(self.bst.root.left.value, 7)
+        self.assertEqual(self.bst.root.left.left.left.left.value, 3)
+        self.assertTrue(self.validate_tree())
+
+    def test_get_min_max_height(self):
+        self.populate_tree()
+
+        min_height, max_height = self.bst.get_min_max_height()
+        self.assertEqual(min_height, 1)
+        self.assertEqual(max_height, 5)
 
 if __name__ == "__main__":
     unittest.main() 

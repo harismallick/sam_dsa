@@ -1,10 +1,5 @@
 import random
-
-class BinaryTreeNode:
-    def __init__(self, value=0, left=None, right=None):
-        self.value: int = value
-        self.left: BinaryTreeNode | None = left
-        self.right: BinaryTreeNode | None = right
+from BinaryTreeNode import BinaryTreeNode
 
 class BinarySearchTree:
     def __init__(self):
@@ -58,9 +53,78 @@ class BinarySearchTree:
 
         return None, None
     
-    def delete(self, value: int) -> None:
+    # def count_child_nodes(self, node) -> tuple[]:
 
+    #     count: int = 0
+    #     if node.left is not None:
+    #         count += 1
+    #     if node.right is not None:
+    #         count += 1
+
+    #     return count
+    
+    def delete(self, value: int) -> None:
+        parent, current = self.lookup_node(value)
+        is_current_right_of_parent: bool = True if parent.right is current else False
+
+        if current is None:
+            raise Exception("The number does not exist. Nothing to delete.")
+        
+        if current.left is not None and current.right is not None:
+            new_left_subtree = current.left
+            new_right_subtree = current.right
+            if is_current_right_of_parent:
+                parent.right = new_right_subtree
+            else:
+                parent.left = new_right_subtree
+
+            right_subtree_leaf = new_right_subtree
+
+            while right_subtree_leaf.left is not None:
+                right_subtree_leaf = right_subtree_leaf.left
+            
+            right_subtree_leaf.left = new_left_subtree
+
+        elif current.left is not None or current.right is not None:
+            child_node_of_current = current.left if current.left is not None else current.right
+            if is_current_right_of_parent:
+                parent.right = child_node_of_current
+            else:
+                parent.left = child_node_of_current
+            
+        else:
+            if is_current_right_of_parent:
+                parent.right = None
+            else:
+                parent.left = None
+
+        self.total_nodes -= 1
         return
+
+    def get_min_max_height(self) -> tuple[int, int]:
+        """
+        Tuple returns the min_height as the left value and max_height as the right value
+        """
+
+        min_max_track: list[int | None, int | None] = [None, None]
+        def find_tree_height(self, node:BinaryTreeNode, min_max_tuple, height: int = 1):
+            if node is None:
+                if min_max_tuple[0] is None:
+                    min_max_tuple[0] = height - 1
+                    min_max_tuple[1] = height - 1
+                    return
+                min_max_tuple[1] = height-1 if height-1 > min_max_tuple[1] else min_max_tuple[1]
+                min_max_tuple[0] = height -1 if height-1 < min_max_tuple[0] else min_max_tuple[0]
+                return
+            
+            new_height = height + 1
+            find_tree_height(self, node.left, min_max_tuple, new_height)
+            find_tree_height(self, node.right, min_max_tuple, new_height)
+            
+            return
+        find_tree_height(self, self.root, min_max_track)
+        return min_max_track
+
 
     def dfs_pre(self) -> list[int]:
         items: list[int] = []
