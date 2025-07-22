@@ -20,6 +20,28 @@ class RedBlackTree():
         self.root: RedBlackTreeNode = None
         self.total_nodes: int = 0
 
+
+    def insert_iter(self, value: int) -> None:   
+        self.total_nodes += 1
+        if self.root is None:
+            self.root = RedBlackTreeNode(value, None, None, None)
+            return
+        
+        current_node = self.root
+        previous_node = None
+        while current_node is not None:
+            previous_node = current_node
+            if value <= current_node.value:
+                current_node = current_node.left
+
+            else:
+                current_node = current_node.right
+
+        if value <= previous_node.value:
+            previous_node.left = RedBlackTreeNode(value, None, None, previous_node)
+        else:
+            previous_node.right = RedBlackTreeNode(value, None, None, previous_node)
+
     def _rotate_right(self, pivot_point: RedBlackTreeNode) -> None:
         if pivot_point is None:
             raise Exception("Passed in node is of None value.")
@@ -28,12 +50,25 @@ class RedBlackTree():
             raise Exception("No left child node to rotate with.")
         
         parent = pivot_point.parent
-        parents_new_child = pivot_point.left
-        parent.left = parents_new_child
-        # Continue here
+        parents_new_child: RedBlackTreeNode = pivot_point.left
 
+        if parent is None:
+            self.root = parents_new_child
 
-        pass
+        elif parent.left is pivot_point:
+            parent.left = parents_new_child
+
+        else:
+            parent.right = parents_new_child
+
+        pivot_point.left = parents_new_child.right
+        parents_new_child.right = pivot_point
+
+        parents_new_child.parent = parent
+        pivot_point.parent = parents_new_child
+        pivot_point.left.parent = pivot_point
+
+        return
 
 if __name__ == "__main__":
     node3 = RedBlackTreeNode(3, None, None, None)
