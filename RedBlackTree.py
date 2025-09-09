@@ -1,6 +1,12 @@
 from BinaryTreeNode import BinaryTreeNode
 from enum import Enum
 
+# Four rules of a RB Tree:
+# 1. A node must be either red or black
+# 2. Root node must be black
+# 3. Red node can only have black children
+# 4. All paths from root to leaves must contain the same number of black nodes
+
 class Color(Enum):
     RED = "RED"
     BLACK = "BLACK"
@@ -70,6 +76,34 @@ class RedBlackTree():
 
         return
 
+    def _rotate_left(self, pivot_point: RedBlackTreeNode) -> None:
+        if pivot_point is None:
+            raise Exception("Passed in node is of None value.")
+        
+        if pivot_point.left is None:
+            raise Exception("No left child node to rotate with.")
+        
+        parent = pivot_point.parent
+        parents_new_child: RedBlackTreeNode = pivot_point.right
+
+        if parent is None:
+            self.root = parents_new_child
+
+        elif parent.left is pivot_point:
+            parent.left = parents_new_child
+
+        else:
+            parent.right = parents_new_child
+
+        pivot_point.right = parents_new_child.left
+        parents_new_child.left = pivot_point
+
+        parents_new_child.parent = parent
+        pivot_point.parent = parents_new_child
+        pivot_point.right.parent = pivot_point
+
+        return
+    
 if __name__ == "__main__":
     node3 = RedBlackTreeNode(3, None, None, None)
     node4 = RedBlackTreeNode(4, None, None, None)
