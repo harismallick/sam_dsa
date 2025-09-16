@@ -5,6 +5,30 @@ class TestRBTree(unittest.TestCase):
     def setUp(self):
         self.rbtree = RedBlackTree()
 
+    # def manual_rb_tree(self):
+    #     node_6 = RedBlackTreeNode(6, None, None, None, Color.BLACK)
+    #     node_5 = RedBlackTreeNode(5, None, None, None, Color.BLACK)
+    #     node_15 = RedBlackTreeNode(15, None, None, None, Color.RED)
+    #     node_14 = RedBlackTreeNode(14, None, None, None, Color.BLACK)
+    #     node_16 = RedBlackTreeNode(16, None, None, None, Color.BLACK)
+
+    #     node_6.left = node_5
+    #     node_5.parent = node_6
+
+    #     node_6.right = node_15
+    #     node_15.parent = node_6
+
+    #     node_15.left = node_14
+    #     node_14.parent = node_15
+
+    #     node_15.right = node_16
+    #     node_16.parent = node_15
+        
+    #     self.rbtree.root = node_6
+    #     self.rbtree.total_nodes = 5
+
+    #     pass
+
     def populate_tree(self):
         values: list[int] = [10,4,2,7,1,3,6,8,9]
         for num in values:
@@ -82,9 +106,9 @@ class TestRBTree(unittest.TestCase):
         # Check that red node only has black children:
         if node.color == Color.RED:
             if node.left is not None:
-                self.assertEqual(node.left.color, Color.BLACK)
+                self.assertEqual(node.left.color, Color.BLACK, "RULE BROKEN: Red node must have a black child.")
             if node.right is not None:
-                self.assertEqual(node.right.color, Color.BLACK)
+                self.assertEqual(node.right.color, Color.BLACK, "RULE BROKEN: Red node must have a black child.")
 
         count = count + 1 if node.color == Color.BLACK else count
 
@@ -95,19 +119,27 @@ class TestRBTree(unittest.TestCase):
         starting_node = self.rbtree.root
         
         # Validate rule 2:
-        self.assertEqual(starting_node.color, Color.BLACK)
+        self.assertEqual(starting_node.color, Color.BLACK, "RULE BROKEN: Root node must be black.")
 
         black_node_count: set[int] = set()
 
 
-        self.traverse_tree(self, self.rbtree.root, black_node_count, 0)
+        self.traverse_tree(self.rbtree.root, black_node_count, 0)
 
         # Check that only one element is in the set for a balanced RB Tree:
-        self.assertEqual(len(black_node_count), 1)
+        self.assertEqual(len(black_node_count), 1, "RULE BROKEN: All paths from root to leaves must contain the same number of black nodes.")
 
         # Create our own test case to run the above tests:
 
         return
+
+    # def test_manual_rb_tree(self):
+    #     self.manual_rb_tree()
+    #     self.validate_rb_tree()
+
+    def test_populated_rb_tree(self):
+        self.populate_tree()
+        self.validate_rb_tree()
 
 if __name__ == "__main__":
     unittest.main()
