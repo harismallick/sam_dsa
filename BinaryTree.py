@@ -7,6 +7,7 @@ class BinarySearchTree:
         self.total_nodes: int = 0
 
     def insert_iter(self, value: int) -> None:   
+        # This function is called 'iter' because we are using loop not recursion to insert the node.
         self.total_nodes += 1
         if self.root is None:
             self.root = BinaryTreeNode(value)

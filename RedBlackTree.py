@@ -11,6 +11,10 @@ class Color(Enum):
     RED = "RED"
     BLACK = "BLACK"
 
+class Direction(Enum):
+    LEFT = "LEFT"
+    RIGHT = "RIGHT"
+
 class RedBlackTreeNode(BinaryTreeNode):
 
     def __init__(self, value: int, left, right, parent: BinaryTreeNode | None, color=Color.RED):
@@ -26,12 +30,45 @@ class RedBlackTree():
         self.root: RedBlackTreeNode = None
         self.total_nodes: int = 0
 
+    def get_grandparent(self, node: RedBlackTreeNode) -> tuple[RedBlackTreeNode, Direction]:
+        if node is None:
+            return None
+        
+        if node.parent is None:
+            return None
+        
+        if node.parent.parent is None:
+            return None
+        
+        grandparent: RedBlackTreeNode = node.parent.parent
+        if grandparent.left is node.parent:
+            direction: Direction = Direction.LEFT
+        else:
+            direction = Direction.RIGHT
 
-    def insert_iter(self, value: int) -> None:   
+        return (grandparent, direction)
+    
+    def get_uncle(self, node: RedBlackTreeNode) -> tuple[RedBlackTreeNode, Direction]:
+        grandparent, parent_direction = self.get_grandparent(node)
+        uncle_direction: Direction = Direction.LEFT if parent_direction == Direction.RIGHT else Direction.RIGHT
+        uncle: RedBlackTreeNode = None
+        if uncle_direction == Direction.LEFT:
+            uncle = grandparent.left
+        else:
+            uncle = grandparent.right
+        return (uncle, uncle_direction)
+
+    def insert_iter(self, value: int) -> None:
+        new_node: RedBlackTreeNode = self.__insert_iter(value)
+        self.fix_violations(new_node)
+        return
+    
+    def __insert_iter(self, value: int) -> RedBlackTreeNode:   
+        # This function is called 'iter' because we are using loop not recursion to insert the node.
         self.total_nodes += 1
         if self.root is None:
             self.root = RedBlackTreeNode(value, None, None, None)
-            return
+            return self.root
         
         current_node = self.root
         previous_node = None
@@ -43,10 +80,24 @@ class RedBlackTree():
             else:
                 current_node = current_node.right
 
+        new_node: RedBlackTreeNode = RedBlackTreeNode(value, None, None, previous_node)
         if value <= previous_node.value:
-            previous_node.left = RedBlackTreeNode(value, None, None, previous_node)
+            previous_node.left = new_node
         else:
-            previous_node.right = RedBlackTreeNode(value, None, None, previous_node)
+            previous_node.right = new_node
+        
+        return new_node
+
+    def fix_violations(self, new_node: RedBlackTreeNode) -> None:
+        if self.root is new_node:
+            self.root.color = Color.BLACK
+            return
+
+        violating_node = new_node
+        while violating_node.parent and violating_node.parent.color == Color.RED:
+            # violating_node_uncle
+            pass
+        return
 
     def _rotate_right(self, pivot_point: RedBlackTreeNode) -> None:
         if pivot_point is None:
