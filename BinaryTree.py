@@ -102,6 +102,68 @@ class BinarySearchTree:
         self.total_nodes -= 1
         return
 
+    def delete_optimised(self, value: int) -> None:
+
+        parent, current = self.lookup_node(value) # Current is the node to delete
+        
+        if parent is None:
+            root_delete: bool = True
+        else:
+            is_current_right_of_parent: bool = True if parent.right is current else False
+            root_delete = False
+
+
+        # Does the node to delete have any children?
+        if current.left is None and current.right is None:
+            if root_delete:
+                self.root = None
+                return
+            
+            if is_current_right_of_parent:
+                parent.right = None
+            else:
+                parent.left = None
+
+        # Node to delete has both left and right children?        
+        if current.right is not None:
+            # successor_helper_func
+            successor_node, successor_node_parent = self.find_successor(current.right, current)
+
+            # Move right sub-tree up to replace successor
+            if successor_node is not current.right:
+                successor_node_parent.left = successor_node.right
+                successor_node.right = current.right
+            
+            successor_node.left = current.left
+
+            if root_delete:
+                self.root = successor_node
+
+            elif is_current_right_of_parent:
+                parent.right = successor_node
+            
+            else:
+                parent.left = successor_node
+
+        # Does the node to delete have left children only?
+        else:
+            if root_delete:
+                self.root = current.left
+            elif is_current_right_of_parent:
+                parent.right = current.left
+            else:
+                parent.left = current.left
+
+        self.total_nodes -= 1
+
+        return
+    
+    def find_successor(self, node: BinaryTreeNode, parent: BinaryTreeNode) -> BinaryTreeNode:
+        if node.left is None:
+            return node, parent
+        
+        return self.find_successor(node.left, node)
+
     def get_min_max_height(self) -> tuple[int, int]:
         """
         Tuple returns the min_height as the left value and max_height as the right value

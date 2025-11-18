@@ -70,7 +70,7 @@ class RedBlackTree():
     def insert_iter(self, value: int) -> None:
         print(f"Trying to insert {value}")
         new_node: RedBlackTreeNode = self.__insert_iter(value)
-        self.fix_violations(new_node)
+        self.fix_insert_violations(new_node)
         return
     
     def __insert_iter(self, value: int) -> RedBlackTreeNode:   
@@ -98,7 +98,7 @@ class RedBlackTree():
         
         return new_node
 
-    def fix_violations(self, new_node: RedBlackTreeNode) -> None:
+    def fix_insert_violations(self, new_node: RedBlackTreeNode) -> None:
         if self.root is new_node:
             print("Violation Fix Case 1")
             self.root.color = Color.BLACK
@@ -200,6 +200,71 @@ class RedBlackTree():
             pivot_point.right.parent = pivot_point
 
         return
+
+    def delete_node(self, value:int) -> None:
+
+        print(f"Trying to delete {value}")
+        successor_node, deleted_node = self.__delete_node(value)
+        if deleted_node.color == Color.BLACK:
+            self.fix_delete_violations(successor_node)
+
+        return
+    
+    def __delete_node(self, value: int) -> tuple[RedBlackTreeNode, RedBlackTreeNode]:
+        
+        parent, current = self.lookup_node(value) # Current is the node to delete
+        
+        if parent is None:
+            root_delete: bool = True
+        else:
+            is_current_right_of_parent: bool = True if parent.right is current else False
+            root_delete = False
+
+
+        # Does the node to delete have any children?
+        if current.left is None and current.right is None:
+            if root_delete:
+                self.root = None
+                return
+            
+            if is_current_right_of_parent:
+                parent.right = None
+            else:
+                parent.left = None
+
+        # Node to delete has both left and right children?        
+        if current.right is not None:
+            # successor_helper_func
+            successor_node, successor_node_parent = self.find_successor(current.right, current)
+
+            # Move right sub-tree up to replace successor
+            if successor_node is not current.right:
+                successor_node_parent.left = successor_node.right
+                successor_node.right = current.right
+            
+            successor_node.left = current.left
+
+            if root_delete:
+                self.root = successor_node
+
+            elif is_current_right_of_parent:
+                parent.right = successor_node
+            
+            else:
+                parent.left = successor_node
+
+        # Does the node to delete have left children only?
+        else:
+            if root_delete:
+                self.root = current.left
+            elif is_current_right_of_parent:
+                parent.right = current.left
+            else:
+                parent.left = current.left
+
+        self.total_nodes -= 1
+
+        return (successor_node, current)
     
 if __name__ == "__main__":
     node3 = RedBlackTreeNode(3, None, None, None)

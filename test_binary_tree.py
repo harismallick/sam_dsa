@@ -6,8 +6,11 @@ class TestBinaryTree(unittest.TestCase):
     def setUp(self):
         self.bst = BinarySearchTree()
 
-    def populate_tree(self):
-        values: list[int] = [8, 4, 7, 3, 6, 5, 1, 2]
+    def populate_tree(self, test_list=None):
+        if len(test_list) is not None:
+            values = test_list
+        else:
+            values: list[int] = [8, 4, 7, 3, 6, 5, 1, 2]
         for num in values:
             self.bst.insert_iter(num)
     
@@ -154,6 +157,40 @@ class TestBinaryTree(unittest.TestCase):
         min_height, max_height = self.bst.get_min_max_height()
         self.assertEqual(min_height, 1)
         self.assertEqual(max_height, 5)
+
+    def test_delete_optimised_root_delete_successor_no_right_child(self):
+        self.populate_tree([10,5,12,-1,6,11,14,7,13])
+        self.bst.delete_optimised(10)
+
+        self.assertEqual(self.bst.root.value, 11)
+        self.assertEqual(self.bst.total_nodes, 8)
+        self.assertEqual(self.bst.root.right.left, None)
+        self.assertEqual(self.bst.root.left.value, 5)
+        self.assertEqual(self.bst.root.right.value, 12)
+
+        return
+    
+    def test_delete_optimised_root_delete_successor_with_right_child(self):
+        self.populate_tree([10,5,13,-1,6,11,14,7,12,15])
+        self.bst.delete_optimised(10)
+
+        self.assertEqual(self.bst.root.value, 11)
+        self.assertEqual(self.bst.total_nodes, 9)
+        self.assertEqual(self.bst.root.right.left.value, 12)
+        self.assertEqual(self.bst.root.left, 5)
+        self.assertEqual(self.bst.root.right, 13)
+
+        return
+
+    def test_delete_optimised_delete_node_with_right_child_as_successor(self):
+        self.populate_tree([10,5,13,-1,6,11,14,7,12,15])
+        self.bst.delete_optimised(5)
+
+        self.assertEqual(self.bst.root.value, 10)
+        self.assertEqual(self.bst.total_nodes, 9)
+        self.assertEqual(self.bst.root.left, 6)
+        self.assertEqual(self.bst.root.left.right, 7)
+        self.assertEqual(self.bst.root.left.left, -1)
 
 if __name__ == "__main__":
     unittest.main() 
