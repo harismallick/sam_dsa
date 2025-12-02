@@ -33,13 +33,13 @@ class RedBlackTree():
 
     def get_grandparent(self, node: RedBlackTreeNode) -> tuple[RedBlackTreeNode, Direction]:
         if node is None:
-            return None
+            return None, None
         
         if node.parent is None:
-            return None
+            return None, None
         
         if node.parent.parent is None:
-            return None
+            return None, None
         
         grandparent: RedBlackTreeNode = node.parent.parent
         if grandparent.left is node.parent:
@@ -51,6 +51,9 @@ class RedBlackTree():
     
     def get_uncle(self, node: RedBlackTreeNode) -> tuple[RedBlackTreeNode, Direction]:
         grandparent, parent_direction = self.get_grandparent(node)
+        if grandparent is None:
+            return None, None
+
         uncle_direction: Direction = Direction.LEFT if parent_direction == Direction.RIGHT else Direction.RIGHT
         uncle: RedBlackTreeNode = None
         if uncle_direction == Direction.LEFT:
@@ -68,7 +71,7 @@ class RedBlackTree():
 
 
     def insert_iter(self, value: int) -> None:
-        print(f"Trying to insert {value}")
+        # print(f"Trying to insert {value}")
         new_node: RedBlackTreeNode = self.__insert_iter(value)
         self.fix_insert_violations(new_node)
         return
@@ -100,7 +103,7 @@ class RedBlackTree():
 
     def fix_insert_violations(self, new_node: RedBlackTreeNode) -> None:
         if self.root is new_node:
-            print("Violation Fix Case 1")
+            # print("Violation Fix Case 1")
             self.root.color = Color.BLACK
             return
 
@@ -109,7 +112,7 @@ class RedBlackTree():
             uncle, uncle_direction = self.get_uncle(violating_node)
             grandparent, grandparent_direction = self.get_grandparent(violating_node)
             if uncle and uncle.color == Color.RED:
-                print("Violation Fix Case 2")
+                # print("Violation Fix Case 2")
                 uncle.color = Color.BLACK
                 violating_node.parent.color = Color.BLACK
                 grandparent.color = Color.RED
@@ -117,9 +120,9 @@ class RedBlackTree():
                 continue
             
             violating_node_direction = self.get_node_direction_to_parent(violating_node)
-            if violating_node_direction != grandparent_direction:
+            if grandparent_direction and violating_node_direction != grandparent_direction:
                 # case 3
-                print("Violation Fix Case 3")
+                # print("Violation Fix Case 3")
                 violating_node = violating_node.parent
                 if violating_node_direction == Direction.RIGHT:
                     self._rotate_left(violating_node)
@@ -128,7 +131,7 @@ class RedBlackTree():
                     self._rotate_right(violating_node)
                 
             #case 4
-            print("Violation Fix Case 4")
+            # print("Violation Fix Case 4")
             violating_node_parent = violating_node.parent
             if grandparent_direction == Direction.RIGHT:
                 self._rotate_left(grandparent)
@@ -201,6 +204,12 @@ class RedBlackTree():
 
         return
 
+    def find_successor(self, node: BinaryTreeNode, parent: BinaryTreeNode) -> BinaryTreeNode:
+        if node.left is None:
+            return node, parent
+        
+        return self.find_successor(node.left, node)
+
     def delete_node(self, value:int) -> None:
 
         print(f"Trying to delete {value}")
@@ -213,6 +222,7 @@ class RedBlackTree():
     def __delete_node(self, value: int) -> tuple[RedBlackTreeNode, RedBlackTreeNode]:
         
         parent, current = self.lookup_node(value) # Current is the node to delete
+        self.total_nodes -= 1
         
         if parent is None:
             root_delete: bool = True
@@ -221,17 +231,22 @@ class RedBlackTree():
             root_delete = False
 
 
+        # CASE 1: Node to be deleted has not children
         # Does the node to delete have any children?
         if current.left is None and current.right is None:
             if root_delete:
                 self.root = None
-                return
             
-            if is_current_right_of_parent:
-                parent.right = None
-            else:
-                parent.left = None
+            # if is_current_right_of_parent:
+            #     parent.right = None
+            # else:
+            #     parent.left = None
+            current.value = None
 
+            return (current, current)
+
+# TO DO: HANDLE Successor OF NIL NODES
+        # CASE 2: Node to be deleted has a right child and may have a left child
         # Node to delete has both left and right children?        
         if current.right is not None:
             # successor_helper_func
@@ -253,16 +268,16 @@ class RedBlackTree():
             else:
                 parent.left = successor_node
 
+        # CASE 3: Node to be deleted only has a left child.
         # Does the node to delete have left children only?
         else:
+            successor_node = current.left
             if root_delete:
                 self.root = current.left
             elif is_current_right_of_parent:
                 parent.right = current.left
             else:
                 parent.left = current.left
-
-        self.total_nodes -= 1
 
         return (successor_node, current)
     

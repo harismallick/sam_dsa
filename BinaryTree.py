@@ -117,13 +117,14 @@ class BinarySearchTree:
         if current.left is None and current.right is None:
             if root_delete:
                 self.root = None
-                return
             
             if is_current_right_of_parent:
                 parent.right = None
             else:
                 parent.left = None
 
+            return
+        
         # Node to delete has both left and right children?        
         if current.right is not None:
             # successor_helper_func

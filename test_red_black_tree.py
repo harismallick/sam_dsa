@@ -60,8 +60,11 @@ class TestRBTree(unittest.TestCase):
         self.validate_rb_tree()
         pass
 
-    def populate_tree(self):
-        values: list[int] = [10,4,2,7,1,3,6,8,9]
+    def populate_tree(self, test_list=None):
+        if test_list is not None:
+            values = test_list
+        else:
+            values: list[int] = [10,4,2,7,1,3,6,8,9]
         for num in values:
             self.rbtree.insert_iter(num)
 
@@ -196,7 +199,7 @@ class TestRBTree(unittest.TestCase):
         self.assertEqual(self.rbtree.root.right.color, Color.RED)
         return
     
-    def test_rbtree_case_2_3_4(self):
+    def test_rbtree_insert_case_2_3_4(self):
         self.manual_rb_tree()
         self.rbtree.insert_iter(10)
         self.validate_rb_tree()
@@ -204,6 +207,12 @@ class TestRBTree(unittest.TestCase):
         self.assertEqual(self.rbtree.root.left.right.right.value, 10)
 
         return
+
+    def test_lookup_on_custom_rbtree(self):
+        self.populate_tree([10,5,30,1,7,25,40,20,28])
+
+        return
+    
 
 if __name__ == "__main__":
     unittest.main()

@@ -7,7 +7,7 @@ class TestBinaryTree(unittest.TestCase):
         self.bst = BinarySearchTree()
 
     def populate_tree(self, test_list=None):
-        if len(test_list) is not None:
+        if test_list is not None:
             values = test_list
         else:
             values: list[int] = [8, 4, 7, 3, 6, 5, 1, 2]
@@ -192,5 +192,18 @@ class TestBinaryTree(unittest.TestCase):
         self.assertEqual(self.bst.root.left.right, 7)
         self.assertEqual(self.bst.root.left.left, -1)
 
+    def test_delete_optimised_delete_leaf_node_on_right_of_parent(self):
+        self.populate_tree([10,5,13,-1,6,11,14,7,12,15])
+        self.bst.delete_optimised(12)
+
+        self.assertEqual(self.bst.root.right.left.right, None)
+
+    def test_delete_optimised_delete_left_node_on_left_of_parent(self):
+        self.populate_tree([10,5,13,-1,6,11,14,7,12,15])
+        self.bst.delete_optimised(7)
+
+        self.assertEqual(self.bst.root.left.right.left, None)
+
 if __name__ == "__main__":
-    unittest.main() 
+    unittest.main()
+    pass
