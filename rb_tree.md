@@ -6,3 +6,5 @@
 ![](/diagrams/IMG_6141.PNG)
 
 ![](/diagrams/image0.png)
+
+![](/diagrams/tree_progression.png)

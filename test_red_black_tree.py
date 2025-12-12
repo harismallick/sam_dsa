@@ -4,6 +4,7 @@ from RedBlackTree import RedBlackTreeNode, RedBlackTree, Color
 class TestRBTree(unittest.TestCase):
     def setUp(self):
         self.rbtree = RedBlackTree()
+        self.comparison_tree = RedBlackTree()
 
     def manual_rb_tree(self):
         # # case 1
@@ -67,6 +68,16 @@ class TestRBTree(unittest.TestCase):
             values: list[int] = [10,4,2,7,1,3,6,8,9]
         for num in values:
             self.rbtree.insert_iter(num)
+            self.rbtree.print_tree()
+
+    def populate_comparison_tree(self, test_list=None):
+        if test_list is not None:
+            values = test_list
+        else:
+            values: list[int] = [10,4,2,7,1,3,6,8,9]
+        for num in values:
+            self.comparison_tree.insert_iter(num)
+            self.comparison_tree.print_tree()
 
     def test_right_rotation_on_root(self):
         self.manual_rb_tree()
@@ -213,6 +224,29 @@ class TestRBTree(unittest.TestCase):
 
         return
     
+    def test_delete_node_with_no_children(self):
+        self.populate_tree([10,5,30,1,7,25,40,20,28])
+        # self.rbtree.delete_node(1)
+        
+        self.validate_rb_tree()
+        test = RedBlackTreeNode(10, None, None, None, Color.BLACK)
+        self.assertEqual(self.rbtree.root, test)
+
+        return
+
+    def test_dunder_eq_of_rbtree_class_correct(self):
+        self.populate_tree([10,5,30,1,7,25,40,20,28])
+        self.populate_comparison_tree([10,5,30,1,7,25,40,20,28])
+
+        self.assertEqual(self.rbtree, self.comparison_tree)
+        return
+    
+    def test_dunder_eq_of_rbtree_class_incorrect(self):
+        self.populate_tree([10,5,30,1,7,25,40,20,28])
+        self.populate_comparison_tree([5,10,30,1,7,25,40,20,28])
+
+        self.assertNotEqual(self.rbtree, self.comparison_tree)
+        return
 
 if __name__ == "__main__":
     unittest.main()

@@ -24,12 +24,51 @@ class RedBlackTreeNode(BinaryTreeNode):
         self.color: str = color
         self.parent: RedBlackTreeNode = parent
 
+    def __eq__(self, other) -> bool:
+        if other.value != self.value:
+            return False
+        
+        if other.color != self.color:
+            return False
+        
+        if other.parent is None and self.parent is None:
+            return True
+        
+        if other.parent and self.parent:
+            if other.parent.value != self.parent.value:
+                return False
+            
+            return True
+        
+        return False
+
 
 class RedBlackTree():
 
     def __init__(self):
         self.root: RedBlackTreeNode = None
         self.total_nodes: int = 0
+
+    def __eq__(self, other) -> bool:
+
+        self_queue: list[RedBlackTreeNode | None] = [self.root]
+        other_queue: list = [other.root]
+        
+        while len(self_queue) > 0:
+            current_node = self_queue.pop(0)
+            other_current = other_queue.pop(0)
+
+            if current_node != other_current:
+                return False
+            
+            if current_node is not None:
+                self_queue.append(current_node.left)
+                self_queue.append(current_node.right)
+            if other_current is not None:
+                other_queue.append(other_current.left)
+                other_queue.append(other_current.right)
+
+        return True
 
     def get_grandparent(self, node: RedBlackTreeNode) -> tuple[RedBlackTreeNode, Direction]:
         if node is None:
@@ -141,6 +180,9 @@ class RedBlackTree():
             # Change color of OG grandparent and parent
             grandparent.color = Color.RED
             violating_node_parent.color = Color.BLACK
+
+        # This line is very important:
+        self.root.color = Color.BLACK
 
         return
 
@@ -281,6 +323,20 @@ class RedBlackTree():
 
         return (successor_node, current)
     
+    def print_tree(self) -> None:
+        print_queue: list[RedBlackTreeNode | None] = [self.root]
+        
+        while len(print_queue) > 0:
+            current_node = print_queue.pop(0)
+            if current_node is not None:
+                print(current_node.value, current_node.color, end=" ")
+                print_queue.append(current_node.left)
+                print_queue.append(current_node.right)
+
+        print()
+
+        return
+
 if __name__ == "__main__":
     node3 = RedBlackTreeNode(3, None, None, None)
     node4 = RedBlackTreeNode(4, None, None, None)
