@@ -4,7 +4,7 @@ from RedBlackTree import RedBlackTreeNode, RedBlackTree, Color
 class TestRBTree(unittest.TestCase):
     def setUp(self):
         self.rbtree = RedBlackTree()
-        self.comparison_tree = RedBlackTree()
+        # self.comparison_tree = RedBlackTree()
 
     def manual_rb_tree(self):
         # # case 1
@@ -58,17 +58,18 @@ class TestRBTree(unittest.TestCase):
         node_8.left = node_5
 
         self.rbtree.root = node_8
-        self.validate_rb_tree()
+        TestRBTree.validate_rb_tree(self.rbtree)
         pass
 
-    def populate_tree(self, test_list=None):
+    @staticmethod
+    def populate_tree(tree_to_populate: RedBlackTree, test_list=None):
         if test_list is not None:
             values = test_list
         else:
             values: list[int] = [10,4,2,7,1,3,6,8,9]
         for num in values:
-            self.rbtree.insert_iter(num)
-            self.rbtree.print_tree()
+            tree_to_populate.insert_iter(num)
+            tree_to_populate.print_tree()
 
     def populate_comparison_tree(self, test_list=None):
         if test_list is not None:
@@ -144,35 +145,36 @@ class TestRBTree(unittest.TestCase):
         return
     
     # Define helper functions to validate RB Tree:
-    def traverse_tree(self, node: RedBlackTreeNode, black_node_count: set[int], count: int):
+    @staticmethod
+    def traverse_tree(node: RedBlackTreeNode, black_node_count: set[int], count: int):
         if node is None:
             return black_node_count.add(count)
 
         # Check that red node only has black children:
         if node.color == Color.RED:
             if node.left is not None:
-                self.assertEqual(node.left.color, Color.BLACK, "RULE BROKEN: Red node must have a black child.")
+                assert node.left.color == Color.BLACK, "RULE BROKEN: Red node must have a black child."
             if node.right is not None:
-                self.assertEqual(node.right.color, Color.BLACK, "RULE BROKEN: Red node must have a black child.")
+                assert node.right.color == Color.BLACK, "RULE BROKEN: Red node must have a black child."
 
         count = count + 1 if node.color == Color.BLACK else count
 
-        self.traverse_tree(node.left, black_node_count, count)
-        self.traverse_tree(node.right, black_node_count, count)
+        TestRBTree.traverse_tree(node.left, black_node_count, count)
+        TestRBTree.traverse_tree(node.right, black_node_count, count)
 
-    def validate_rb_tree(self):
-        starting_node = self.rbtree.root
+    @staticmethod
+    def validate_rb_tree(rbtree: RedBlackTree):
+        starting_node = rbtree.root
         
         # Validate rule 2:
-        self.assertEqual(starting_node.color, Color.BLACK, "RULE BROKEN: Root node must be black.")
+        assert starting_node.color == Color.BLACK, "RULE BROKEN: Root node must be black."
 
         black_node_count: set[int] = set()
 
-
-        self.traverse_tree(self.rbtree.root, black_node_count, 0)
+        TestRBTree.traverse_tree(rbtree.root, black_node_count, 0)
 
         # Check that only one element is in the set for a balanced RB Tree:
-        self.assertEqual(len(black_node_count), 1, "RULE BROKEN: All paths from root to leaves must contain the same number of black nodes.")
+        assert len(black_node_count) == 1, "RULE BROKEN: All paths from root to leaves must contain the same number of black nodes."
 
         # Create our own test case to run the above tests:
 
@@ -181,24 +183,24 @@ class TestRBTree(unittest.TestCase):
     # def test_validate_rb_tree_new_node_is_root(self):
     #     self.rbtree.insert_iter(8)
     #     self.assertEqual(self.rbtree.root.color, Color.BLACK)
-    #     self.validate_rb_tree()
+    #     TestRBTree.validate_rb_tree()
     #     return
 
     # def test_manual_rb_tree(self):
     #     self.manual_rb_tree()
-    #     self.validate_rb_tree()
+    #     TestRBTree.validate_rb_tree()
 
     # def test_populated_rb_tree(self):
     #     self.populate_tree()
-    #     self.validate_rb_tree()
+    #     TestRBTree.validate_rb_tree()
 
     def test_insert_on_empty_rbtree(self):
         self.rbtree.insert_iter(15)
-        self.validate_rb_tree()
+        TestRBTree.validate_rb_tree(self.rbtree)
         self.rbtree.insert_iter(5)
-        self.validate_rb_tree()
+        TestRBTree.validate_rb_tree(self.rbtree)
         self.rbtree.insert_iter(1)
-        self.validate_rb_tree()
+        TestRBTree.validate_rb_tree(self.rbtree)
 
         self.assertEqual(self.rbtree.root.value, 5)
         self.assertEqual(self.rbtree.root.color, Color.BLACK)
@@ -213,39 +215,54 @@ class TestRBTree(unittest.TestCase):
     def test_rbtree_insert_case_2_3_4(self):
         self.manual_rb_tree()
         self.rbtree.insert_iter(10)
-        self.validate_rb_tree()
+        TestRBTree.validate_rb_tree(self.rbtree)
         self.assertEqual(self.rbtree.root.value, 12)
         self.assertEqual(self.rbtree.root.left.right.right.value, 10)
 
         return
 
     def test_lookup_on_custom_rbtree(self):
-        self.populate_tree([10,5,30,1,7,25,40,20,28])
+        self.populate_tree(self.rbtree, [10,5,30,1,7,25,40,20,28])
 
         return
     
     def test_delete_node_with_no_children(self):
-        self.populate_tree([10,5,30,1,7,25,40,20,28])
-        # self.rbtree.delete_node(1)
+        TestRBTree.populate_tree(self.rbtree, [10,5,30,1,7,25,40,20,28])
+        self.rbtree.lookup_node(30)[1].color = Color.BLACK
+        self.rbtree.lookup_node(1)[1].color = Color.BLACK
+        self.rbtree.lookup_node(7)[1].color = Color.BLACK
+        self.rbtree.lookup_node(25)[1].color = Color.RED
+        self.rbtree.lookup_node(20)[1].color = Color.BLACK
+        self.rbtree.lookup_node(28)[1].color = Color.BLACK
+        TestRBTree.validate_rb_tree(self.rbtree)
+
+        self.rbtree.delete_node(1)
         
-        self.validate_rb_tree()
-        test = RedBlackTreeNode(10, None, None, None, Color.BLACK)
-        self.assertEqual(self.rbtree.root, test)
+        result_tree: RedBlackTree = RedBlackTree()
+        TestRBTree.populate_tree(result_tree, [25,10,30,5,20,28,40,7])
+        self.rbtree.lookup_node(10)[1].color = Color.BLACK
+        self.rbtree.lookup_node(28)[1].color = Color.BLACK
+        self.rbtree.lookup_node(40)[1].color = Color.BLACK
+        TestRBTree.validate_rb_tree(result_tree)
+        
+        self.assertEqual(self.rbtree, result_tree)
 
         return
 
     def test_dunder_eq_of_rbtree_class_correct(self):
-        self.populate_tree([10,5,30,1,7,25,40,20,28])
-        self.populate_comparison_tree([10,5,30,1,7,25,40,20,28])
+        TestRBTree.populate_tree(self.rbtree, [10,5,30,1,7,25,40,20,28])
+        comparison_tree: RedBlackTree = RedBlackTree()
+        TestRBTree.populate_tree(comparison_tree, [10,5,30,1,7,25,40,20,28])
 
-        self.assertEqual(self.rbtree, self.comparison_tree)
+        self.assertEqual(self.rbtree, comparison_tree)
         return
     
     def test_dunder_eq_of_rbtree_class_incorrect(self):
-        self.populate_tree([10,5,30,1,7,25,40,20,28])
-        self.populate_comparison_tree([5,10,30,1,7,25,40,20,28])
+        TestRBTree.populate_tree(self.rbtree, [10,5,30,1,7,25,40,20,28])
+        comparison_tree: RedBlackTree = RedBlackTree()
+        TestRBTree.populate_tree(comparison_tree, [10,5,20,1,7,25,40,28,30])
 
-        self.assertNotEqual(self.rbtree, self.comparison_tree)
+        self.assertNotEqual(self.rbtree, comparison_tree)
         return
 
 if __name__ == "__main__":

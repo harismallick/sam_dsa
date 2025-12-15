@@ -220,7 +220,7 @@ class RedBlackTree():
         if pivot_point is None:
             raise Exception("Passed in node is of None value.")
         
-        if pivot_point.left is None:
+        if pivot_point.right is None:
             raise Exception("No left child node to rotate with.")
         
         parent = pivot_point.parent
@@ -251,6 +251,42 @@ class RedBlackTree():
             return node, parent
         
         return self.find_successor(node.left, node)
+
+    def lookup_node(self, value: int) -> tuple[RedBlackTreeNode | None, RedBlackTreeNode | None]:
+        if self.root is None:
+            return None, None
+
+        current_node = self.root
+        parent_node = None
+        while current_node is not None:
+            if value < current_node.value:
+                parent_node = current_node
+                current_node = current_node.left
+
+            elif value > current_node.value:
+                parent_node = current_node
+                current_node = current_node.right
+            
+            elif value == current_node.value:
+                return (parent_node, current_node)            
+
+        return None, None
+
+    # TO DO: write function to get_sibling()
+
+    def fix_delete_violations(self, successor: RedBlackTreeNode) -> None:
+        violating_node = successor
+        # Case 1: Sibling (S) is red
+        sibling, sibling_direction = self.get_sibling(violating_node)
+
+        # Case 2: S is black and S has two black children
+
+        # Case 3: S is black and S.left is Red and S.right is Black
+
+        # Case 4: S is black and S.right is Red; S.left can be anything
+
+
+        return
 
     def delete_node(self, value:int) -> None:
 
