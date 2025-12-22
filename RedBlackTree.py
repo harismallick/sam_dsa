@@ -273,17 +273,68 @@ class RedBlackTree():
         return None, None
 
     # TO DO: write function to get_sibling()
+    def get_sibling(self, node) -> tuple[RedBlackTreeNode, Direction]:
+
+        if node.parent is None:
+            raise Exception(f"The node {node} does not have a parent therefore cannot have a sibling.")
+
+        sibling_node_direction: Direction = Direction.RIGHT if node.parent.left is node else Direction.LEFT
+
+        if sibling_node_direction == Direction.LEFT:
+            sibling = node.parent.left
+        else:
+            sibling = node.parent.right
+        return (sibling, sibling_node_direction)
 
     def fix_delete_violations(self, successor: RedBlackTreeNode) -> None:
         violating_node = successor
-        # Case 1: Sibling (S) is red
-        sibling, sibling_direction = self.get_sibling(violating_node)
 
-        # Case 2: S is black and S has two black children
+        while violating_node is not self.root and violating_node.color == Color.BLACK:
+            # Case 1: Sibling (S) is red
+            sibling, sibling_direction = self.get_sibling(violating_node)
+            violating_node_direction = Direction.LEFT if sibling_direction == Direction.RIGHT else Direction.RIGHT
+            if sibling.color == Color.RED:
+                sibling.color = Color.BLACK
+                violating_node.parent.color = Color.RED
 
-        # Case 3: S is black and S.left is Red and S.right is Black
+                if violating_node_direction is Direction.LEFT:
+                    self._rotate_left(violating_node.parent)
+                else:
+                    self._rotate_right(violating_node.parent)
 
-        # Case 4: S is black and S.right is Red; S.left can be anything
+                sibling, sibling_direction = self.get_sibling(violating_node)
+                violating_node_direction = Direction.LEFT if sibling_direction == Direction.RIGHT else Direction.RIGHT
+
+            # Case 2: S is black and S has two black children
+            if sibling.color == Color.BLACK and \
+                (sibling.left is None or sibling.left.color == Color.BLACK) and \
+                (sibling.right is None or sibling.right.color == Color.BLACK):
+                        
+                sibling.color = Color.RED
+                violating_node = violating_node.parent
+
+            else:
+                # Case 3: VN on the left AND S is black AND S.right is Black
+                if violating_node_direction == Direction.LEFT \
+                    and sibling.right.color == Color.BLACK:
+                    
+                    sibling.left.color = Color.BLACK
+                    sibling.color = Color.RED
+                    self._rotate_right(sibling)
+                    
+                elif violating_node_direction == Direction.RIGHT \
+                    and sibling.left.color == Color.BLACK:
+
+                    sibling.right.color = Color.BLACK
+                    sibling.color = Color.RED
+                    self._rotate_left(sibling)
+                    pass
+
+                # Case 4: S is black and S.right is Red; S.left can be anything
+                # TO DO
+                if violating_node_direction:
+                    pass
+
 
 
         return
